@@ -1,46 +1,129 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
-// Setup type definitions for built-in Supabase Runtime APIs
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
+import { z } from 'zod';
 
-console.log("Hello from Functions!");
+const InviteSchema = z.object({
+  organization_id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['member', 'admin']).default('member'),
+});
 
-// This endpoint uses 'publishable' | 'secret' access, apiKey is required.
-// Use publishable for Client-facing, key-validated endpoints
-// Use secret for Server-to-server, internal calls
 export default {
-  fetch: withSupabase({ auth: ["publishable", "secret"] }, async (req, ctx) => {
-    // Called by another service with a secret key
-    // ctx.supabaseAdmin bypasses RLS — use for privileged operations
-    /*
-    if (ctx.authMode === "secret") {
-      const { user_id } = await req.json();
-      const { data } = await ctx.supabaseAdmin.auth.admin.getUserById(user_id);
-
-      return Response.json({
-        email: data?.user?.email,
-      });
+  fetch: withSupabase({ auth: ["publishable"] }, async (req, ctx) => {
+    if (req.method !== 'POST') {
+      return Response.json(
+        { error: 'Method not allowed' },
+        { status: 405 },
+      );
     }
-    */
+    const token = req.headers
+    .get("authorization")
+    ?.replace("Bearer ", "");
 
-    const { name } = await req.json();
+    const {
+     data: authData,
+     error: authError
+    } = await ctx.supabase.auth.getUser(token);
 
-    return Response.json({
-      message: `Hello ${name}!`,
-    });
+    const user = authData?.user;
+
+
+    if (authError || !user) {
+      return Response.json(
+        { error: 'Unauthorized' },
+        { status: 401 },
+      );
+    }
+
+    try {
+      const body = await req.json();
+
+      const parsed = InviteSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return Response.json(
+          {
+            error: 'Validation failed',
+            details: parsed.error.flatten(),
+          },
+          { status: 400 },
+        );
+      }
+
+      const {
+        organization_id,
+        email,
+        role,
+      } = parsed.data;
+
+      const normalizedEmail =
+        email.trim().toLowerCase();
+
+
+      const { data: organization } = await ctx.supabaseAdmin
+        .from('organizations')
+        .select('id, created_by')
+        .eq('id', organization_id)
+        .single();
+
+      if (!organization) {
+        return Response.json(
+          { error: 'Organization not found' },
+          { status: 404 },
+        );
+      }
+
+      if (organization.created_by !== user.id) {
+        return Response.json(
+          { error: 'Forbidden' },
+          { status: 403 },
+        );
+      }
+
+      const { data: memberData, error: memberError } = await ctx.supabaseAdmin
+        .from('organization_members')
+        .insert({
+          organization_id,
+          email: normalizedEmail,
+          role,
+          status: 'invited',
+        })
+        .select()
+        .single();
+
+      if (memberError) {
+        if (memberError.code === '23505') {
+          return Response.json(
+            {
+              error:
+                'Invitation already exists for this email',
+            },
+            { status: 409 },
+          );
+        }
+
+        return Response.json(
+          {
+            error: memberError.message,
+          },
+          { status: 500 },
+        );
+      }
+
+      return Response.json(memberData, {
+        status: 201,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return Response.json(
+        {
+          error: 'Internal server error',
+        },
+        {
+          status: 500,
+        },
+      );
+    }
   }),
 };
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/send-invite' \
-    --header 'apiKey: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH' \
-    --data '{"name":"Functions"}'
-
-*/

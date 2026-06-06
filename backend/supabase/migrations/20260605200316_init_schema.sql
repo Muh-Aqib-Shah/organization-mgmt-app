@@ -18,7 +18,7 @@ create table organizations (
   type org_type not null,
   created_by uuid not null references auth.users(id) on delete cascade,
   created_at timestamptz not null default now(),
-  extra_info text
+  school_district text
 );
 
 create table organization_members (
