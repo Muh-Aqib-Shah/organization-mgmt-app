@@ -14,9 +14,14 @@ export interface OrganizationMember {
   id: string;
   organization_id: string;
   user_id: string | null;
-  email: string;     
+  email: string;
   status: MemberStatus;
   role: MemberRole;
   invited_at: string;
   joined_at: string | null;
 }
+
+export type CreateOrganizationInput = Omit<
+  Organization,
+  'id' | 'created_by' | 'created_at'
+>;

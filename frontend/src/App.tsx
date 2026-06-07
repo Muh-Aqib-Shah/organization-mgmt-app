@@ -21,7 +21,6 @@ function App() {
       <AuthProvider>
         <NavBar />
         <Routes>
-          {/* Public Routes */}
           <Route path="/auth" element={<AuthPage />} />
 
           <Route
@@ -32,11 +31,13 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/organization/create" element={<CreateOrganization />} />
+            <Route
+              path="/organization/create"
+              element={<CreateOrganization />}
+            />
             <Route path="/organization/:orgId" element={<OrgPage />} />
           </Route>
 
-          {/* Redirect root to dashboard or sign-in */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
