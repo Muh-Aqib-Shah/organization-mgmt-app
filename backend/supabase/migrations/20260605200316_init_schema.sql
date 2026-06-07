@@ -4,7 +4,7 @@ create extension if not exists "citext";
 
 create type org_type as enum ('school', 'nonprofit', 'business');
 create type member_status as enum ('invited', 'active');
-create type member_role as enum ('member', 'admin');
+create type member_role as enum ('member', 'admin','owner');
 
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
