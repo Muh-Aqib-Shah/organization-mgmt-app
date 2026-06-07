@@ -13,11 +13,18 @@ create policy profiles_update_own_profile
   for update
   using (auth.uid() = id);
 
-create policy organizations_manage_own_orgs
+create policy organizations_insert_policy
+  on organizations
+  for insert
+  to authenticated
+  with check (auth.uid() = created_by);
+
+create policy organizations_modify_policy
   on organizations
   for all
+  to authenticated
   using (auth.uid() = created_by);
-
+  
 create policy organization_members_manage_by_org_admin
   on organization_members
   for all
