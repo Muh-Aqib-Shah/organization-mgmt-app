@@ -2,7 +2,7 @@ import { LogOut, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/lib/auth/auth-context';
 import { useAuth } from '@/lib/auth/auth-hooks';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function NavBar() {
   const navigate = useNavigate();
@@ -29,9 +29,11 @@ export function NavBar() {
           <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
             <Building2 className="w-6 h-6 text-white" />
           </div>
-          <p className="text-xl font-bold text-slate-900">
-            Organization Manager
-          </p>
+          <Link to={'/dashboard'}>
+            <p className="text-xl font-bold text-slate-900">
+              Organization Manager
+            </p>
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">

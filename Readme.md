@@ -4,8 +4,8 @@ A production-minded full-stack admin dashboard built with **React + Supabase** a
 
 **Live URLs**
 
-- 🚀 Production: `https://<your-project>.vercel.app` _(deployed from `main`)_
-- 🔧 Development Preview: `https://<your-project>-git-development.vercel.app` _(deployed from `development`)_
+- 🚀 Production: `https://organization-mgmt-app.vercel.app/` _(deployed from `production`)_
+- 🔧 Development Preview: `https://organization-mgmt-app-git-development-aqibs-projects-f7435a81.vercel.app/` _(deployed from `development`)_
 
 **Test Credentials**
 
@@ -162,6 +162,8 @@ type            org_type    NOT NULL  -- 'school' | 'nonprofit' | 'business'
 created_by      uuid        FK → auth.users(id)
 created_at      timestamptz DEFAULT now()
 school_district text        NULL      -- only populated when type = 'school'
+
+UNIQUE (created_by, name, type)
 ```
 
 ### `organization_members`
@@ -235,11 +237,11 @@ UNIQUE (organization_id, email)
 ## Branching Strategy
 
 ```
-main           ← production (deploys to Production Vercel URL)
+production           ← production (deploys to Production Vercel URL)
   └── development  ← default working branch (deploys to Preview Vercel URL)
-        └── feature/auth-flow
-        └── feature/org-creation
-        └── feature/member-invitations
+        └── feature/send-invite
+        └── feature/db-schema
+        └── feature/auth-and-dashboard
 ```
 
 - All feature work happens on short-lived branches off `development`.
@@ -262,8 +264,8 @@ main           ← production (deploys to Production Vercel URL)
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-handle>/<repo-name>.git
-cd <repo-name>/frontend
+git clone https://github.com/Muh-Aqib-Shah/organization-mgmt-app.git
+cd organization-mgmt-app/frontend
 
 # 2. Install dependencies
 npm install
@@ -446,13 +448,7 @@ After the successful insert (line ~85 in `index.ts`), add:
 
 **No real email delivery** — The Edge Function creates the invitation record but does not send an actual email. The architecture is wired for it — the send step is a single function call away.
 
-**`VITE_SUPABASE_API_KEY` duplication** — This env var is the same as the anon key and is passed as an `apiKey` header when invoking the Edge Function from the client. This is a workaround for a local dev edge case; in production the Supabase client handles auth headers automatically.
-
-**No loading skeletons** — Loading states use simple text fallbacks rather than skeleton components. A proper skeleton pass would improve perceived performance.
-
-**Breadcrumb links are static** — The breadcrumbs on the org detail page have placeholder `href="#"` values. They should link to `/dashboard` and the org name respectively.
-
----
+## **No loading skeletons** — Loading states use simple text fallbacks rather than skeleton components. A proper skeleton pass would improve perceived performance.
 
 ## What I'd Do With Another Day
 
