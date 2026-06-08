@@ -200,9 +200,9 @@ UNIQUE (organization_id, email)
 │   │   │   ├── ui/               # shadcn/ui primitives
 │   │   │   ├── navbar/           # Auth-aware navigation bar
 │   │   │   ├── footer/           # Footer component
-|   |   |   |──  auth/            # Authentication Components
-|   |   |   |──  create-organization/  # Create Org Form Components
-|   |   |   |──  dashboard/       # Dashboard Components
+|   |   |   |── auth/            # Authentication Components
+|   |   |   |── create-organization/  # Create Org Form Components
+|   |   |   |── dashboard/       # Dashboard Components
 │   │   │   └── ProtectedRoute.tsx
 │   │   ├── lib/
 │   │   │   ├── auth/             # AuthContext + auth hooks
@@ -216,9 +216,11 @@ UNIQUE (organization_id, email)
 │   │   │   ├── DashboardPage.tsx     # Organization directory
 │   │   │   ├── CreateOrganization.tsx# Create org form
 │   │   │   └── Organization.tsx      # Org detail + members
+│   │   │   └── NotFound.tsx      # Page for WildCard route entries
 │   │   ├── App.tsx               # Router + AuthProvider
 │   │   └── main.tsx              # Entry point + QueryClientProvider
 │   ├── .env.example
+|   |── vercel.json
 │   ├── vite.config.ts
 │   └── package.json
 │
@@ -226,12 +228,13 @@ UNIQUE (organization_id, email)
     └── supabase/
         ├── migrations/
         │   ├── 20260605200316_init_schema.sql   # Tables, types, constraints
+        |   |── 20260606196000_triggers.sql   # Triggers and Functions
         │   └── 20260606210000_rls_policies.sql  # RLS policies
         ├── functions/
         │   └── send-invite/
         │       ├── index.ts      # Edge Function (Deno)
         │       └── deno.json     # Import map
-        ├── seed.sql              # (optional) seed data
+        ├── seed.ts               #  seed data
         └── config.toml           # Supabase local dev config
 ```
 
@@ -308,6 +311,9 @@ In the Supabase Dashboard → **SQL Editor**, run the migration files in order:
 -- Paste contents of: backend/supabase/migrations/20260605200316_init_schema.sql
 
 -- Step 2: RLS policies
+-- Paste contents of: backend/supabase/migrations/20260606196000_triggers.sql
+
+-- Step 3: RLS policies
 -- Paste contents of: backend/supabase/migrations/20260606210000_rls_policies.sql
 ```
 
@@ -375,7 +381,7 @@ Set these in **Vercel → Project → Settings → Environment Variables** for b
 3. Framework preset: **Vite**.
 4. Add environment variables (see above).
 5. Configure branch deployments:
-   - `main` → Production environment
+   - `production` → Production environment
    - `development` → Preview environment (Vercel does this automatically per-branch)
 
 Vercel will build and deploy on every push. The `frontend/` subdirectory is the app root — no monorepo config is needed beyond setting the root directory.
