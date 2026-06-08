@@ -1,5 +1,5 @@
-import "@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "@supabase/server";
+import '@supabase/functions-js/edge-runtime.d.ts';
+import { withSupabase } from '@supabase/server';
 import { z } from 'zod';
 
 const InviteSchema = z.object({
@@ -9,30 +9,19 @@ const InviteSchema = z.object({
 });
 
 export default {
-  fetch: withSupabase({ auth: ["publishable"] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ['publishable'] }, async (req, ctx) => {
     if (req.method !== 'POST') {
-      return Response.json(
-        { error: 'Method not allowed' },
-        { status: 405 },
-      );
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
-    const token = req.headers
-    .get("authorization")
-    ?.replace("Bearer ", "");
+    const token = req.headers.get('authorization')?.replace('Bearer ', '');
 
-    const {
-     data: authData,
-     error: authError
-    } = await ctx.supabase.auth.getUser(token);
+    const { data: authData, error: authError } =
+      await ctx.supabase.auth.getUser(token);
 
     const user = authData?.user;
 
-
     if (authError || !user) {
-      return Response.json(
-        { error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
@@ -50,15 +39,9 @@ export default {
         );
       }
 
-      const {
-        organization_id,
-        email,
-        role,
-      } = parsed.data;
+      const { organization_id, email, role } = parsed.data;
 
-      const normalizedEmail =
-        email.trim().toLowerCase();
-
+      const normalizedEmail = email.trim().toLowerCase();
 
       const { data: organization } = await ctx.supabaseAdmin
         .from('organizations')
@@ -74,10 +57,7 @@ export default {
       }
 
       if (organization.created_by !== user.id) {
-        return Response.json(
-          { error: 'Forbidden' },
-          { status: 403 },
-        );
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
       }
 
       const { data: memberData, error: memberError } = await ctx.supabaseAdmin
@@ -95,8 +75,7 @@ export default {
         if (memberError.code === '23505') {
           return Response.json(
             {
-              error:
-                'Invitation already exists for this email',
+              error: 'Invitation already exists for this email',
             },
             { status: 409 },
           );
@@ -110,9 +89,12 @@ export default {
         );
       }
 
-      return Response.json(memberData, {
-        status: 201,
-      });
+      return Response.json(
+        { memberData, message: 'Invited!' },
+        {
+          status: 201,
+        },
+      );
     } catch (error) {
       console.error(error);
 

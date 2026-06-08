@@ -4,14 +4,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
+import { signInSchema, signUpSchema } from '@/lib/schema/auth-schemas';
 import {
-  signInSchema,
-  signUpSchema,
-} from '@/lib/schema/auth-schemas';
-import {
-    type SignInFormData,
-    type SignUpFormData,
-} from "@/lib/types/auth-types"
+  type SignInFormData,
+  type SignUpFormData,
+} from '@/lib/types/auth-types';
 import { useAuth } from '@/lib/auth/auth-hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +21,7 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form';
+import { toast } from 'sonner'; // Direct node_modules se import hoga
 import background from '@/assets/background.jpg';
 
 type AuthMode = 'signin' | 'signup';
@@ -37,7 +35,6 @@ export function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  // Unified form that handles both modes
   type AuthFormData = SignInFormData & Partial<SignUpFormData>;
 
   const form = useForm<AuthFormData>({
@@ -62,6 +59,9 @@ export function AuthPage() {
     if (mode === 'signin') {
       const user = await signIn(data as SignInFormData);
       if (user) {
+        toast.success('Sign Up Successful', {
+          description: 'Your Account has been created',
+        });
         navigate('/dashboard');
       } else if (authError) {
         setServerError(authError.message);
@@ -69,6 +69,9 @@ export function AuthPage() {
     } else {
       const user = await signUp(data as SignUpFormData);
       if (user) {
+        toast.success('Sign In Successful', {
+          description: 'Your Account has been logged in',
+        });
         setSignUpSuccess(true);
         setTimeout(() => {
           setMode('signin');
@@ -88,12 +91,9 @@ export function AuthPage() {
       className="min-h-screen w-full flex relative bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Left Side - Background with Text Overlay */}
       <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden">
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-linear-to-r from-slate-900 via-slate-900/60 to-transparent" />
 
-        {/* Text Content */}
         <div className="absolute inset-0 flex flex-col justify-end items-start p-12 z-10">
           <div className="max-w-lg absolute">
             <p className="text-sm text-start font-bold text-white mb-4 leading-tight">
@@ -121,10 +121,8 @@ export function AuthPage() {
         </div>
       </div>
 
-      {/* Form Section - Right Side */}
       <div className="m-9 rounded-md w-full lg:w-1/2 flex flex-col items-center justify-center p-6 lg:p-12 bg-white">
         <div className="w-full max-w-md">
-          {/* Success Message */}
           {signUpSuccess && (
             <div className="mb-6 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
@@ -139,7 +137,6 @@ export function AuthPage() {
 
           {!signUpSuccess && (
             <>
-              {/* Header */}
               <div className="m-4">
                 <h3 className="text-2xl text-start font-bold text-slate-900 mb-1">
                   {isSignIn ? 'Welcome Back!' : 'Get Started'}
@@ -151,7 +148,6 @@ export function AuthPage() {
                 </p>
               </div>
 
-              {/* Error Alert */}
               {serverError && (
                 <div className="mb-6 flex items-center gap-3 rounded-lg bg-red-50 p-4 border border-red-200">
                   <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
@@ -159,13 +155,11 @@ export function AuthPage() {
                 </div>
               )}
 
-              {/* Form */}
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-3"
                 >
-                  {/* Email Field */}
                   <FormField
                     control={form.control}
                     name="email"
@@ -189,7 +183,6 @@ export function AuthPage() {
                     )}
                   />
 
-                  {/* Password Field */}
                   <FormField
                     control={form.control}
                     name="password"
@@ -234,7 +227,6 @@ export function AuthPage() {
                     )}
                   />
 
-                  {/* Confirm Password - Sign Up Only */}
                   {!isSignIn && (
                     <FormField
                       control={form.control}
@@ -275,7 +267,6 @@ export function AuthPage() {
                     />
                   )}
 
-                  {/* Submit Button */}
                   <Button
                     type="submit"
                     className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors mt-6"
@@ -293,7 +284,6 @@ export function AuthPage() {
                     )}
                   </Button>
 
-                  {/* Divider */}
                   <div className="relative my-3">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-slate-200" />
@@ -305,7 +295,6 @@ export function AuthPage() {
                 </form>
               </Form>
 
-              {/* Toggle Link */}
               <div className="mt-4 text-center">
                 <p className="text-slate-600">
                   {isSignIn
