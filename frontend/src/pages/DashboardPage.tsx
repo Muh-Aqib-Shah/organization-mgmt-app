@@ -42,7 +42,6 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-2xl overflow-hidden mb-12">
           <div className="grid lg:grid-cols-2 gap-8 p-8 lg:p-12">
@@ -136,7 +135,7 @@ export function DashboardPage() {
                           </div>
 
                           <div>
-                            <p className="font-semibold text-slate-900">
+                            <p className="font-semibold text-start text-slate-900">
                               {org.name}
                             </p>
 
@@ -152,13 +151,6 @@ export function DashboardPage() {
                     );
                   })
                 )}
-              </div>
-
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
-                <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center justify-center gap-2 w-full">
-                  <Building2 className="w-4 h-4" />
-                  View All Organizations
-                </button>
               </div>
             </div>
           </div>

@@ -15,6 +15,7 @@ import { NavBar } from './components/navbar/auth-navbar';
 import { Footer } from './components/footer/footer';
 import { CreateOrganization } from './pages/CreateOrganization';
 import { Toaster } from '@/components/ui/sonner';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -41,7 +42,7 @@ function App() {
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </AuthProvider>
