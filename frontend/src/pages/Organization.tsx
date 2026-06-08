@@ -151,8 +151,9 @@ export function OrgPage() {
   };
 
   return (
-    <div className="m-5 flex flex-col justify-between gap-2 p-4 bg-white border border-gray-100 rounded-xl shadow-sm max-w-5xl mx-auto">
-      <div className="flex justify-start w-full">
+    <div className="m-2 sm:m-5 flex flex-col justify-between gap-4 p-4 sm:p-6 bg-white border border-gray-100 rounded-xl shadow-sm max-w-5xl mx-auto w-full">
+      {/* Breadcrumbs Container with horizontal scroll safety */}
+      <div className="flex justify-start w-full overflow-x-auto pb-1">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -170,57 +171,67 @@ export function OrgPage() {
         </Breadcrumb>
       </div>
 
-      <div></div>
-
-      <main className="space-y-5">
-        <div className="flex justify-between">
-          <div className="flex space-x-4">
-            <p className="text-3xl">{organization_meta.icon}</p>
-            <div>
-              <h2 className="text-start">{organization?.name}</h2>
-              <p className="text-[12px]">
+      <main className="space-y-6">
+        {/* Header Section: Stack on mobile, side-by-side on desktop */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex space-x-4 items-start">
+            <p className="text-3xl select-none pt-0.5">
+              {organization_meta.icon}
+            </p>
+            <div className="space-y-0.5">
+              <h2 className="text-xl font-bold text-gray-900 text-start">
+                {organization?.name}
+              </h2>
+              <p className="text-xs text-gray-500 text-start leading-normal">
                 Manage your organization members and their access
               </p>
             </div>
           </div>
 
-          <div>
-            <Button variant={'default'} className="bg-purple-500">
-              <PlusIcon /> Invite
+          <div className="w-full sm:w-auto shrink-0">
+            <Button
+              variant={'default'}
+              className="bg-purple-500 w-full sm:w-auto justify-center"
+            >
+              <PlusIcon className="w-4 h-4 mr-1.5" /> Invite
             </Button>
           </div>
         </div>
 
-        <form onSubmit={handleInvite}>
-          <div className="relative">
-            <Mail className="absolute top-3 left-2" />
-            <input
-              placeholder="Enter email address to invite"
-              className="w-full p-3 pl-10 border-gray-200 border-2 rounded-md"
-              value={email}
-              type="email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        {/* Invite Email Form: Inline on desktop, beautifully block-stacked on mobile */}
+        <form onSubmit={handleInvite} className="w-full">
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full relative">
+            <div className="relative flex-1 w-full">
+              <Mail className="absolute top-1/2 left-3.5 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                placeholder="Enter email address to invite"
+                className="w-full h-11 p-3 pl-10 border-gray-200 border bg-white rounded-lg text-sm placeholder:text-gray-400 focus:outline-hidden focus:border-indigo-500 transition-colors"
+                value={email}
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
             <Button
               type="submit"
               disabled={inviteLoading}
               variant={'default'}
-              className="absolute right-2 top-2 bg-indigo-500 flex space-x-1.5"
+              className="h-11 bg-indigo-500 flex space-x-1.5 w-full sm:w-auto shrink-0 justify-center items-center px-5 rounded-lg shadow-xs"
             >
-              <Send />
-              {inviteLoading ? 'Sending...' : 'Send Invite'}
+              <Send className="w-4 h-4" />
+              <span>{inviteLoading ? 'Sending...' : 'Send Invite'}</span>
             </Button>
           </div>
         </form>
 
+        {/* Tabs and Filters Layout Structure */}
         <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-3 border-b border-gray-100">
           <Tabs
             defaultValue="all"
-            className="w-full lg:w-auto"
+            className="w-full lg:w-auto overflow-x-auto scrollbar-none"
             value={currentTab}
             onValueChange={handleTabChange}
           >
-            <TabsList className="bg-transparent gap-2 h-auto p-0 border-b border-transparent rounded-none">
+            <TabsList className="bg-transparent gap-2 h-auto p-0 border-b border-transparent rounded-none flex flex-row whitespace-nowrap">
               <TabsTrigger
                 value="all"
                 className="px-3 py-2 text-sm font-semibold text-gray-500 rounded-none border-b-2 border-transparent data-[state=active]:border-b-indigo-600 data-[state=active]:text-indigo-600"
@@ -262,6 +273,7 @@ export function OrgPage() {
             </TabsList>
           </Tabs>
 
+          {/* Search bar and selection drop down filters */}
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -292,119 +304,121 @@ export function OrgPage() {
           </div>
         </div>
 
+        {/* Table Block Container with horizontal layout protection wrapper */}
         <div className="w-full bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-          <Table className="w-full table-fixed">
-            <TableHeader className="bg-gray-50/70 border-b border-gray-100">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-6 py-3.5 text-xs font-semibold text-gray-500 w-2/7">
-                  Member
-                </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-gray-500">
-                  Role
-                </TableHead>
-                <TableHead className="text-center  text-xs font-semibold text-gray-500">
-                  Status
-                </TableHead>
-                <TableHead className="text-center  text-xs font-semibold text-gray-500">
-                  Joined
-                </TableHead>
-                <TableHead className="pr-6 text-right text-xs font-semibold text-gray-500">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedMembers.map((user: OrganizationMemberType) => {
-                const role_meta = getRoleMeta(user.role);
-                return (
-                  <TableRow
-                    key={user.id}
-                    className="border-b border-gray-50 last:border-0 hover:bg-gray-50/40 transition-colors"
-                  >
-                    <TableCell className="pl-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-full text-white font-bold text-xs flex items-center justify-center uppercase tracking-wider`}
+          <div className="w-full overflow-x-auto">
+            <Table className="w-full min-w-[600px] table-fixed">
+              <TableHeader className="bg-gray-50/70 border-b border-gray-100">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-6 py-3.5 text-xs font-semibold text-gray-500 w-[40%]">
+                    Member
+                  </TableHead>
+                  <TableHead className="text-center text-xs font-semibold text-gray-500 w-[15%]">
+                    Role
+                  </TableHead>
+                  <TableHead className="text-center text-xs font-semibold text-gray-500 w-[15%]">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-center text-xs font-semibold text-gray-500 w-[15%]">
+                    Joined
+                  </TableHead>
+                  <TableHead className="pr-6 text-right text-xs font-semibold text-gray-500 w-[15%]">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedMembers.map((user: OrganizationMemberType) => {
+                  const role_meta = getRoleMeta(user.role);
+                  return (
+                    <TableRow
+                      key={user.id}
+                      className="border-b border-gray-50 last:border-0 hover:bg-gray-50/40 transition-colors"
+                    >
+                      <TableCell className="pl-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase tracking-wider shrink-0">
+                            {user.email.at(0)}
+                          </div>
+                          <div className="flex flex-col min-w-0 truncate">
+                            <span className="text-sm font-semibold text-gray-900 truncate">
+                              {user.email.split('@').at(0)}
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium truncate">
+                              {user.email}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <Badge
+                          className={`px-1.5 py-0.5 rounded-md text-xs font-semibold shadow-none border-none tracking-wide capitalize ${role_meta.roleStyle}`}
                         >
-                          {user.email.at(0)}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-gray-900">
-                            {user.email.split('@').at(0)}
-                          </span>
-                          <span className="text-xs text-gray-400 font-medium">
-                            {user.email}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
+                          {user.role}
+                        </Badge>
+                      </TableCell>
 
-                    <TableCell>
-                      <Badge
-                        className={`px-1.5 py-0.5 rounded-md text-xs font-semibold shadow-none border-none tracking-wide capitalize ${role_meta.roleStyle}`}
-                      >
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide ${role_meta?.statusColor.split(' ').slice(1).join(' ') ?? ''}`}
-                      >
+                      <TableCell className="text-center">
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${role_meta?.statusColor.split(' ')[0]}`}
-                        />
-                        {user.status}
-                      </span>
-                    </TableCell>
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide ${role_meta?.statusColor.split(' ').slice(1).join(' ') ?? ''}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${role_meta?.statusColor.split(' ')[0]}`}
+                          />
+                          {user.status}
+                        </span>
+                      </TableCell>
 
-                    <TableCell className="text-sm text-gray-500 font-medium">
-                      {user.joined_at
-                        ? new Date(user.joined_at).toLocaleDateString()
-                        : '-'}
-                    </TableCell>
+                      <TableCell className="text-center text-sm text-gray-500 font-medium">
+                        {user.joined_at
+                          ? new Date(user.joined_at).toLocaleDateString()
+                          : '-'}
+                      </TableCell>
 
-                    <TableCell className="pr-6 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100/70 rounded-md"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem className="text-xs font-medium text-gray-700">
-                            Change Role
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-xs font-medium text-red-600 focus:text-red-600 focus:bg-red-50">
-                            Remove Member
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                      <TableCell className="pr-6 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100/70 rounded-md"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem className="text-xs font-medium text-gray-700">
+                              Change Role
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-xs font-medium text-red-600 focus:text-red-600 focus:bg-red-50">
+                              Remove Member
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
 
-          <div className="flex justify-between">
-            <div className="mt-3 pl-10 text-[13px]">
+          {/* Footer Pagination Segment */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t border-gray-50 bg-gray-50/30">
+            <div className="text-[13px] text-gray-500 text-center sm:text-left">
               {filteredMembers.length > 0 ? (
                 <>
-                  {' '}
                   Showing {(activePage - 1) * 6 + 1} to{' '}
                   {Math.min((activePage - 1) * 6 + 6, filteredMembers.length)}{' '}
-                  entires of {filteredMembers.length}{' '}
+                  entries of {filteredMembers.length}
                 </>
               ) : (
-                <></>
+                'No entries available'
               )}
             </div>
-            <div className="pr-10 pb-3">
+
+            <div className="flex items-center gap-1.5 justify-center">
               {Array.from({ length: totalPages }, (_, index) => {
                 const pageNum = index + 1;
                 const isActive = pageNum === activePage;

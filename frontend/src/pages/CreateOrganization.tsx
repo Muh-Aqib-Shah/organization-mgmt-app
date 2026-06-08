@@ -137,9 +137,10 @@ export function CreateOrganization() {
   ] as const;
 
   return (
-    <div className="my-5 flex gap-6 max-w-6xl mx-auto w-full px-4 items-start">
-      <div className="flex flex-col gap-6 p-6 bg-white border border-gray-100 rounded-xl shadow-sm flex-1 min-w-0">
-        <div className="flex justify-start w-full">
+    <div className="my-5 flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto w-full px-4 items-start">
+      {/* Form Container */}
+      <div className="flex flex-col gap-6 p-4 sm:p-6 bg-white border border-gray-100 rounded-xl shadow-sm flex-1 min-w-0 w-full">
+        <div className="flex justify-start w-full overflow-x-auto pb-1">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -172,6 +173,7 @@ export function CreateOrganization() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 w-full max-w-3xl text-left"
             >
+              {/* Organization Name Field */}
               <FormField
                 control={form.control}
                 name="organizationName"
@@ -205,6 +207,7 @@ export function CreateOrganization() {
                 )}
               />
 
+              {/* Organization Type Field */}
               <FormField
                 control={form.control}
                 name="organizationType"
@@ -224,7 +227,7 @@ export function CreateOrganization() {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 w-full"
+                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1 w-full"
                       >
                         {typeCards.map((card) => {
                           const IconComponent = card.icon;
@@ -284,6 +287,7 @@ export function CreateOrganization() {
                 )}
               />
 
+              {/* Conditional School District Field */}
               {selectedType === 'school' && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                   <FormField
@@ -321,11 +325,12 @@ export function CreateOrganization() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-4">
+              {/* Submit Button Block */}
+              <div className="flex justify-end pt-4 w-full">
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium gap-2 rounded-lg transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="h-11 w-full sm:w-auto px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium gap-2 rounded-lg transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed justify-center"
                 >
                   {isLoading ? (
                     <>
@@ -345,14 +350,15 @@ export function CreateOrganization() {
         </main>
       </div>
 
-      <div className="w-full lg:w-90 shrink-0 bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col gap-6 lg:sticky lg:top-6">
+      {/* Sidebar Info Panel */}
+      <div className="w-full lg:w-90 shrink-0 bg-white border border-gray-100 rounded-2xl shadow-sm p-5 sm:p-6 flex flex-col gap-6 lg:sticky lg:top-6">
         <div className="relative w-full aspect-4/3 bg-linear-to-br from-indigo-50 to-slate-50 rounded-xl overflow-hidden flex items-center justify-center border border-gray-50/50">
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-size-[16px_16px] opacity-60" />
           <div className="px-6 py-8 flex-1 flex flex-col items-center justify-center">
             <img
               src={backSupportImage}
               alt="Create Organization"
-              className="w-full h-full mb-6 object-contain"
+              className="w-full h-full mb-6 object-contain max-h-40 lg:max-h-none"
             />
           </div>
         </div>
