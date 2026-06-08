@@ -4,8 +4,8 @@ A production-minded full-stack admin dashboard built with **React + Supabase** a
 
 **Live URLs**
 
-- 🚀 Production: `https://<your-project>.vercel.app` _(deployed from `main`)_
-- 🔧 Development Preview: `https://<your-project>-git-development.vercel.app` _(deployed from `development`)_
+- 🚀 Production: `https://organization-mgmt-app.vercel.app/` _(deployed from `production`)_
+- 🔧 Development Preview: `https://organization-mgmt-app-git-development-aqibs-projects-f7435a81.vercel.app/` _(deployed from `development`)_
 
 **Test Credentials**
 
@@ -162,6 +162,8 @@ type            org_type    NOT NULL  -- 'school' | 'nonprofit' | 'business'
 created_by      uuid        FK → auth.users(id)
 created_at      timestamptz DEFAULT now()
 school_district text        NULL      -- only populated when type = 'school'
+
+UNIQUE (created_by, name, type)
 ```
 
 ### `organization_members`
@@ -198,6 +200,9 @@ UNIQUE (organization_id, email)
 │   │   │   ├── ui/               # shadcn/ui primitives
 │   │   │   ├── navbar/           # Auth-aware navigation bar
 │   │   │   ├── footer/           # Footer component
+|   |   |   |── auth/            # Authentication Components
+|   |   |   |── create-organization/  # Create Org Form Components
+|   |   |   |── dashboard/       # Dashboard Components
 │   │   │   └── ProtectedRoute.tsx
 │   │   ├── lib/
 │   │   │   ├── auth/             # AuthContext + auth hooks
@@ -211,9 +216,11 @@ UNIQUE (organization_id, email)
 │   │   │   ├── DashboardPage.tsx     # Organization directory
 │   │   │   ├── CreateOrganization.tsx# Create org form
 │   │   │   └── Organization.tsx      # Org detail + members
+│   │   │   └── NotFound.tsx      # Page for WildCard route entries
 │   │   ├── App.tsx               # Router + AuthProvider
 │   │   └── main.tsx              # Entry point + QueryClientProvider
 │   ├── .env.example
+|   |── vercel.json
 │   ├── vite.config.ts
 │   └── package.json
 │
@@ -221,12 +228,13 @@ UNIQUE (organization_id, email)
     └── supabase/
         ├── migrations/
         │   ├── 20260605200316_init_schema.sql   # Tables, types, constraints
+        |   |── 20260606196000_triggers.sql   # Triggers and Functions
         │   └── 20260606210000_rls_policies.sql  # RLS policies
         ├── functions/
         │   └── send-invite/
         │       ├── index.ts      # Edge Function (Deno)
         │       └── deno.json     # Import map
-        ├── seed.sql              # (optional) seed data
+        ├── seed.ts               #  seed data
         └── config.toml           # Supabase local dev config
 ```
 
@@ -235,11 +243,11 @@ UNIQUE (organization_id, email)
 ## Branching Strategy
 
 ```
-main           ← production (deploys to Production Vercel URL)
+production           ← production (deploys to Production Vercel URL)
   └── development  ← default working branch (deploys to Preview Vercel URL)
-        └── feature/auth-flow
-        └── feature/org-creation
-        └── feature/member-invitations
+        └── feature/send-invite
+        └── feature/db-schema
+        └── feature/auth-and-dashboard
 ```
 
 - All feature work happens on short-lived branches off `development`.
@@ -262,8 +270,8 @@ main           ← production (deploys to Production Vercel URL)
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-handle>/<repo-name>.git
-cd <repo-name>/frontend
+git clone https://github.com/Muh-Aqib-Shah/organization-mgmt-app.git
+cd organization-mgmt-app/frontend
 
 # 2. Install dependencies
 npm install
@@ -303,6 +311,9 @@ In the Supabase Dashboard → **SQL Editor**, run the migration files in order:
 -- Paste contents of: backend/supabase/migrations/20260605200316_init_schema.sql
 
 -- Step 2: RLS policies
+-- Paste contents of: backend/supabase/migrations/20260606196000_triggers.sql
+
+-- Step 3: RLS policies
 -- Paste contents of: backend/supabase/migrations/20260606210000_rls_policies.sql
 ```
 
@@ -370,7 +381,7 @@ Set these in **Vercel → Project → Settings → Environment Variables** for b
 3. Framework preset: **Vite**.
 4. Add environment variables (see above).
 5. Configure branch deployments:
-   - `main` → Production environment
+   - `production` → Production environment
    - `development` → Preview environment (Vercel does this automatically per-branch)
 
 Vercel will build and deploy on every push. The `frontend/` subdirectory is the app root — no monorepo config is needed beyond setting the root directory.
@@ -446,13 +457,7 @@ After the successful insert (line ~85 in `index.ts`), add:
 
 **No real email delivery** — The Edge Function creates the invitation record but does not send an actual email. The architecture is wired for it — the send step is a single function call away.
 
-**`VITE_SUPABASE_API_KEY` duplication** — This env var is the same as the anon key and is passed as an `apiKey` header when invoking the Edge Function from the client. This is a workaround for a local dev edge case; in production the Supabase client handles auth headers automatically.
-
-**No loading skeletons** — Loading states use simple text fallbacks rather than skeleton components. A proper skeleton pass would improve perceived performance.
-
-**Breadcrumb links are static** — The breadcrumbs on the org detail page have placeholder `href="#"` values. They should link to `/dashboard` and the org name respectively.
-
----
+## **No loading skeletons** — Loading states use simple text fallbacks rather than skeleton components. A proper skeleton pass would improve perceived performance.
 
 ## What I'd Do With Another Day
 
