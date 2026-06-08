@@ -200,6 +200,9 @@ UNIQUE (organization_id, email)
 │   │   │   ├── ui/               # shadcn/ui primitives
 │   │   │   ├── navbar/           # Auth-aware navigation bar
 │   │   │   ├── footer/           # Footer component
+|   |   |   |──  auth/            # Authentication Components
+|   |   |   |──  create-organization/  # Create Org Form Components
+|   |   |   |──  dashboard/       # Dashboard Components
 │   │   │   └── ProtectedRoute.tsx
 │   │   ├── lib/
 │   │   │   ├── auth/             # AuthContext + auth hooks
