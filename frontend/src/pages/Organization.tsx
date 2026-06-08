@@ -51,7 +51,7 @@ export function OrgPage() {
   const { data: organization, refetch } = useOrganization(orgId!);
 
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'member' | 'admin' | 'all'>('member');
+  const [role, setRole] = useState<'member' | 'admin' | 'all'>('all');
   const [search, setSearch] = useState<string>('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState<string>('all');
@@ -152,20 +152,19 @@ export function OrgPage() {
 
   return (
     <div className="my-2 sm:my-5 mx-auto px-4 sm:px-0 flex flex-col justify-between gap-4 p-4 sm:p-6 bg-white border border-gray-100 rounded-xl shadow-sm max-w-5xl w-full">
-      {/* Breadcrumbs Container with horizontal scroll safety */}
       <div className="px-4 sm:px-8">
         <div className="flex justify-start w-full overflow-x-auto pb-1">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="#">Home</Link>
+                  <Link to="/dashboard">Dashboard</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="#">Components</Link>
+                  <Link to="#">Orgainzation</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>

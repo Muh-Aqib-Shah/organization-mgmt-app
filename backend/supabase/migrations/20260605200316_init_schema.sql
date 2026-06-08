@@ -36,3 +36,4 @@ create table organization_members (
 
 alter table organization_members
   add constraint organization_members_email_check check (email <> '');
+  
