@@ -40,6 +40,7 @@ import backSupportImage from '@/assets/backdrop.png';
 import { supabase } from '@/lib/supabase';
 import { useState } from 'react';
 import { useAuthContext } from '@/lib/auth/auth-context';
+import { toast } from 'sonner';
 
 const organizationFormSchema = z.object({
   organizationName: z.string().min(2, {
@@ -85,21 +86,23 @@ export function CreateOrganization() {
     };
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('organizations')
         .insert([submitData])
         .select()
         .single();
 
-      if (error) throw error;
-
-      //toast.success("Organization created successfully!");
-      console.log('DATA: ', data);
+      if (error) toast.error(error.message);
+      else {
+        toast.success('Organization Created!');
+      }
 
       navigate('/dashboard');
     } catch (error: string | unknown) {
       console.error('Supabase submission payload error:', error);
-      // toast.error(error.message || "Failed to create organization. Please try again.");
+      toast.error('Some Error Occurred', {
+        description: 'Failed To create Organization',
+      });
     } finally {
       setIsLoading(false);
     }

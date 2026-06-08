@@ -14,12 +14,14 @@ import { OrgPage } from './pages/Organization';
 import { NavBar } from './components/navbar/auth-navbar';
 import { Footer } from './components/footer/footer';
 import { CreateOrganization } from './pages/CreateOrganization';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <NavBar />
+        <Toaster position="top-right" richColors />
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
 
